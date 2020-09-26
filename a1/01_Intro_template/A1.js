@@ -60,12 +60,13 @@ var rcState = {type: 'i', value: 1};
 
 // MATERIALS
 /* HINT: YOU WILL NEED TO SHARE VARIABLES FROM HERE */
-var racoonMaterial = new THREE.ShaderMaterial();
+var racoonMaterial = new THREE.ShaderMaterial({});
 
 
 var remoteMaterial = new THREE.ShaderMaterial({
    uniforms: {
     remotePosition: remotePosition,
+    rcState: rcState,
   },
 });
 
@@ -103,6 +104,19 @@ function loadOBJ(file, material, scale, xOff, yOff, zOff, xRot, yRot, zRot) {
     object.traverse(function(child) {
       if (child instanceof THREE.Mesh) {
         child.material = material;
+        /*
+        var child_geometry = new THREE.Geometry().fromBufferGeometry(child.geometry);
+        var z_min = 10.0;
+        var vertices = child_geometry.vertices;
+        console.log('length of vertices is ' + vertices.length);
+        for (let vertex of vertices) {
+          if (vertex.z < z_min) {
+            z_min = vertex.z;
+          }
+        }
+        //var coords_min = child.geometry.boundingBox.min
+        console.log(z_min);
+        */
       }
     });
 
@@ -117,7 +131,7 @@ function loadOBJ(file, material, scale, xOff, yOff, zOff, xRot, yRot, zRot) {
   }, onProgress, onError);
 }
 
-loadOBJ('obj/Racoon.obj', racoonMaterial, 0.5, 0,1,0, Math.PI/2,Math.PI,Math.PI);
+loadOBJ('obj/Racoon.obj', racoonMaterial, 0.5, 0,0,0, Math.PI/2,Math.PI,Math.PI);
 
 // CREATE REMOTE CONTROL
 var remoteGeometry = new THREE.SphereGeometry(1, 32, 32);
