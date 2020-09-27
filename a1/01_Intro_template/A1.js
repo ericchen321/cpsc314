@@ -57,12 +57,15 @@ floor.parent = worldFrame;
 // UNIFORMS
 var remotePosition = {type: 'v3', value: new THREE.Vector3(0,5,3)};
 var rcState = {type: 'i', value: 1};
+var timeInit = Date.now();
+var timeElapsed = {type: 'f', value: 0.0}
 
 // MATERIALS
 /* HINT: YOU WILL NEED TO SHARE VARIABLES FROM HERE */
 var racoonMaterial = new THREE.ShaderMaterial({
   uniforms: {
-    remotePosition: remotePosition
+    remotePosition: remotePosition,
+    timeElapsed: timeElapsed,
   }
 });
 
@@ -174,9 +177,17 @@ function checkKeyboard() {
   racoonMaterial.needsUpdate = true; // Tells three.js that some uniforms might have changed
 }
 
+// UPDATE TIME
+function updateTime() {
+  timeElapsed.value = (Date.now() - timeInit) / 1000.0;
+  //console.log('time is ' + timeElapsed)
+  racoonMaterial.needsUpdate = true; // Tells three.js that some uniforms might have changed
+}
+
 // SETUP UPDATE CALL-BACK
 function update() {
   checkKeyboard();
+  updateTime();
   requestAnimationFrame(update);
   renderer.render(scene, camera);
 }
