@@ -60,7 +60,11 @@ var rcState = {type: 'i', value: 1};
 
 // MATERIALS
 /* HINT: YOU WILL NEED TO SHARE VARIABLES FROM HERE */
-var racoonMaterial = new THREE.ShaderMaterial({});
+var racoonMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    remotePosition: remotePosition
+  }
+});
 
 
 var remoteMaterial = new THREE.ShaderMaterial({
