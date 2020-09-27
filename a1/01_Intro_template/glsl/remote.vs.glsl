@@ -3,8 +3,7 @@ uniform vec3 remotePosition;
 
 void main() {
 	/* HINT: WORK WITH remotePosition HERE! */
-    vec3 pos_delta = vec3(remotePosition.x, remotePosition.y, remotePosition.z);
-    vec3 pos_translated = position + pos_delta;
+    vec3 pos_translated = position + remotePosition;
 
     // Multiply each vertex by the model-view matrix and the projection matrix to get final vertex position
 

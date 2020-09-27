@@ -10,7 +10,7 @@ void main() {
     interpolatedNormal = normal;
 
     // Make paws same scale as the remote orb
-    float scale = 4.0;
+    float scale = 7.0;
     mat4 scaleMatrix = modelMatrix;
     scaleMatrix[0][0] = scale;
     scaleMatrix[1][1] = scale;
@@ -18,9 +18,10 @@ void main() {
 
     // Compute position in world frame
     vec4 position_world = scaleMatrix * vec4(position, 1.0);
+    vec4 a = modelMatrix * position_world;
 
     // Compute distance from vertex to remote's centre
-    interpolatedDist = distance(position_world, vec4(remotePosition, 1.0));
+    interpolatedDist = distance(a, vec4(remotePosition, 1.0));
 
     // Multiply each vertex by the model-view matrix and the projection matrix to get final vertex position
     gl_Position = projectionMatrix * modelViewMatrix * position_world;
