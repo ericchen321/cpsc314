@@ -6,7 +6,8 @@ var scene = new THREE.Scene();
 
 // SETUP RENDERER
 var renderer = new THREE.WebGLRenderer();
-renderer.setClearColor(0xffffff); // white background colour
+//renderer.setClearColor(0xffffff); // white background colour
+renderer.setClearColor(0x000000); // black background colour
 document.body.appendChild(renderer.domElement);
 
 // SETUP CAMERA
@@ -33,8 +34,14 @@ resize();
 var worldFrame = new THREE.AxisHelper(5) ;
 scene.add(worldFrame);
 
+// LIGHT STUFF
+var spotLight = new THREE.SpotLight(0xfff700, 0.4, undefined, Math.PI/4);
+spotLight.position.set(10, 10, 10);
+spotLight.casShadow = true;
+scene.add(spotLight);
+
 var displayScreenGeometry = new THREE.CylinderGeometry(5, 5, 10, 32);
-var displayMaterial = new THREE.MeshBasicMaterial({color: 0xffff00, transparent: true, opacity: 0.2});
+var displayMaterial = new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.2});
 var displayObject = new THREE.Mesh(displayScreenGeometry,displayMaterial);
 displayObject.position.x = 0;
 displayObject.position.y = 5;
@@ -46,7 +53,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture('images/floor.jpg');
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
 floorTexture.repeat.set(1, 1);
 
-var floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture, side: THREE.DoubleSide });
+var floorMaterial = new THREE.MeshPhongMaterial({ map: floorTexture, side: THREE.DoubleSide });
 var floorGeometry = new THREE.PlaneBufferGeometry(30, 30);
 var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.position.y = -0.1;
@@ -57,6 +64,12 @@ floor.parent = worldFrame;
 // UNIFORMS
 var remotePosition = {type: 'v3', value: new THREE.Vector3(0,5,3)};
 var rcState = {type: 'i', value: 1};
+var color_0 = new THREE.Vector3(1,0,0);
+var color_1 = new THREE.Vector3(0,1,0);
+var color_2 = new THREE.Vector3(0,0,1);
+var rcState1_color = {type: 'v3', value: color_0};
+var rcState2_color = {type: 'v3', value: color_1};
+var rcState3_color = {type: 'v3', value: color_2};
 var timeInit = Date.now();
 var timeElapsed = {type: 'f', value: 0.0}
 
@@ -66,16 +79,25 @@ var racoonMaterial = new THREE.ShaderMaterial({
   uniforms: {
     remotePosition: remotePosition,
     timeElapsed: timeElapsed,
+    rcState: rcState,
+    rcState1_color: rcState1_color,
+    rcState2_color: rcState2_color,
+    rcState3_color: rcState3_color,
   }
 });
-
+racoonMaterial.transparent = true;
 
 var remoteMaterial = new THREE.ShaderMaterial({
    uniforms: {
     remotePosition: remotePosition,
     rcState: rcState,
+    timeElapsed: timeElapsed,
+    rcState1_color: rcState1_color,
+    rcState2_color: rcState2_color,
+    rcState3_color: rcState3_color,
   },
 });
+remoteMaterial.transparent = true;
 
 // LOAD SHADERS
 var shaderFiles = [
@@ -111,19 +133,6 @@ function loadOBJ(file, material, scale, xOff, yOff, zOff, xRot, yRot, zRot) {
     object.traverse(function(child) {
       if (child instanceof THREE.Mesh) {
         child.material = material;
-        /*
-        var child_geometry = new THREE.Geometry().fromBufferGeometry(child.geometry);
-        var z_min = 10.0;
-        var vertices = child_geometry.vertices;
-        console.log('length of vertices is ' + vertices.length);
-        for (let vertex of vertices) {
-          if (vertex.z < z_min) {
-            z_min = vertex.z;
-          }
-        }
-        //var coords_min = child.geometry.boundingBox.min
-        console.log(z_min);
-        */
       }
     });
 
@@ -180,8 +189,18 @@ function checkKeyboard() {
 // UPDATE TIME
 function updateTime() {
   timeElapsed.value = (Date.now() - timeInit) / 1000.0;
-  //console.log('time is ' + timeElapsed)
+
+  //var noise_r = 0.002;
+  //var noise_g = 0.002; 
+  //var noise_b = 0.002;  
+  var noise_r = Math.random()/100;
+  var noise_g = Math.random()/100;
+  var noise_b = Math.random()/100;
+  rcState1_color.value.set(color_0.x+noise_r, color_0.y+noise_g, color_0.z+noise_b);
+  rcState2_color.value.set(color_1.x+noise_r, color_1.y+noise_g, color_1.z+noise_b);
+  rcState3_color.value.set(color_2.x+noise_r, color_2.y+noise_g, color_2.z+noise_b);
   racoonMaterial.needsUpdate = true; // Tells three.js that some uniforms might have changed
+  remoteMaterial.needsUpdate = true;
 }
 
 // SETUP UPDATE CALL-BACK
