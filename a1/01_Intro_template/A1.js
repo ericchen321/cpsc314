@@ -199,9 +199,9 @@ function updateTime() {
   //var noise_r = 0.002;
   //var noise_g = 0.002; 
   //var noise_b = 0.002;  
-  var noise_r = Math.random()/10;
-  var noise_g = Math.random()/10;
-  var noise_b = Math.random()/10;
+  var noise_r = Math.random()/2;
+  var noise_g = Math.random()/2;
+  var noise_b = Math.random()/2;
   rcState1_color.value.set(1.0+noise_r, 0.0+noise_g, 0.0+noise_b);
   rcState2_color.value.set(0.0+noise_r, 1.0+noise_g, 0.0+noise_b);
   rcState3_color.value.set(0.0+noise_r, 0.0+noise_g, 1.0+noise_b);
