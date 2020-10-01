@@ -10,19 +10,17 @@ uniform float timeElapsed;
 #define PERIOD 2.0 // period for sinusoidal scaling
 
 void main() {
-	float alpha = abs(cos(2.0*PI*(1.0/PERIOD)*timeElapsed));
-
 	// HINT: WORK WITH rcState HERE
 
 	//Paint it red
 	if (rcState == 1) {
-    	gl_FragColor = vec4(normalize(rcState1_color), alpha);
+    	gl_FragColor = vec4(normalize(rcState1_color), 1.0);
 	}
 	else if (rcState == 2) {
-		gl_FragColor = vec4(normalize(rcState2_color), alpha);
+		gl_FragColor = vec4(normalize(rcState2_color), 1.0);
 	}
 	else {
-		gl_FragColor = vec4(normalize(rcState3_color), alpha);
+		gl_FragColor = vec4(normalize(rcState3_color), 1.0);
 	}
 
     //gl_FragColor = vec4(1, 0, 0, 1);

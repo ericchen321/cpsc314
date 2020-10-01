@@ -3,6 +3,7 @@ varying vec3 interpolatedNormal;
 /* HINT: YOU WILL NEED A DIFFERENT SHARED VARIABLE TO COLOR ACCORDING TO POSITION */
 varying float interpolatedDist;
 
+uniform float distObjToFloor;
 uniform vec3 remotePosition;
 uniform float timeElapsed;
 
@@ -21,7 +22,8 @@ void main() {
     scaleMatrix[2][2] = SCALE * abs(cos(2.0*PI*(1.0/PERIOD)*timeElapsed));
 
     // Compute position in world frame
-    vec4 position_world = modelMatrix * scaleMatrix * vec4(position, 1.0);
+    vec4 position_world_untranslated = modelMatrix * scaleMatrix * vec4(position, 1.0);
+    vec4 position_world = vec4(position_world_untranslated.x, position_world_untranslated.y-distObjToFloor, position_world_untranslated.z, 1.0);
 
     // Compute distance from vertex to remote's centre
     interpolatedDist = distance(position_world, vec4(remotePosition, 1.0));

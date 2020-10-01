@@ -17,15 +17,17 @@ void main() {
   // Set final rendered color according to the surface normal
   float threshold = 2.8;
 
+  float alpha = exp(-1.0 * interpolatedDist);
+
   if (interpolatedDist < threshold) {
     if (rcState == 1) {
-    	gl_FragColor = vec4(normalize(rcState1_color), 0.6);
+    	gl_FragColor = vec4(normalize(rcState1_color), alpha);
 	  }
     else if (rcState == 2) {
-      gl_FragColor = vec4(normalize(rcState2_color), 0.6);
+      gl_FragColor = vec4(normalize(rcState2_color), alpha);
     }
     else {
-      gl_FragColor = vec4(normalize(rcState3_color), 0.6);
+      gl_FragColor = vec4(normalize(rcState3_color), alpha);
     }
   }
   else {

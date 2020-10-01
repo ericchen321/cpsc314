@@ -60,16 +60,16 @@ floor.position.y = -0.1;
 floor.rotation.x = Math.PI / 2;
 scene.add(floor);
 floor.parent = worldFrame;
+var bboxFloor = new THREE.Box3().setFromObject(floor);
+console.log('z min for floor is ' + bboxFloor.min.y);
 
 // UNIFORMS
+var distObjToFloor = {type: 'f', value: 0.0}; // distance from object's bottom to floor
 var remotePosition = {type: 'v3', value: new THREE.Vector3(0,5,3)};
 var rcState = {type: 'i', value: 1};
-var color_0 = new THREE.Vector3(1,0,0);
-var color_1 = new THREE.Vector3(0,1,0);
-var color_2 = new THREE.Vector3(0,0,1);
-var rcState1_color = {type: 'v3', value: color_0};
-var rcState2_color = {type: 'v3', value: color_1};
-var rcState3_color = {type: 'v3', value: color_2};
+var rcState1_color = {type: 'v3', value: new THREE.Vector3(1,0,0)};
+var rcState2_color = {type: 'v3', value: new THREE.Vector3(0,1,0)};
+var rcState3_color = {type: 'v3', value: new THREE.Vector3(0,0,1)};
 var timeInit = Date.now();
 var timeElapsed = {type: 'f', value: 0.0}
 
@@ -77,6 +77,7 @@ var timeElapsed = {type: 'f', value: 0.0}
 /* HINT: YOU WILL NEED TO SHARE VARIABLES FROM HERE */
 var racoonMaterial = new THREE.ShaderMaterial({
   uniforms: {
+    distObjToFloor: distObjToFloor,
     remotePosition: remotePosition,
     timeElapsed: timeElapsed,
     rcState: rcState,
@@ -143,11 +144,16 @@ function loadOBJ(file, material, scale, xOff, yOff, zOff, xRot, yRot, zRot) {
     object.scale.set(scale,scale,scale);
     object.parent = worldFrame;
     scene.add(object);
+    var bboxObj = new THREE.Box3().setFromObject(object);
+    console.log('z min for racoon is ' + bboxObj.min.y);
+    distObjToFloor.value = bboxObj.min.y - bboxFloor.min.y;
+    console.log('offset value is ' + (bboxObj.min.y - bboxFloor.min.y))
+    material.needsUpdate = true;
 
   }, onProgress, onError);
 }
 
-loadOBJ('obj/Racoon.obj', racoonMaterial, 0.5, 0,0,0, Math.PI/2,Math.PI,Math.PI);
+loadOBJ('obj/Racoon.obj', racoonMaterial, 0.5, 0,1,0, Math.PI/2,Math.PI,Math.PI);
 
 // CREATE REMOTE CONTROL
 var remoteGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -193,12 +199,12 @@ function updateTime() {
   //var noise_r = 0.002;
   //var noise_g = 0.002; 
   //var noise_b = 0.002;  
-  var noise_r = Math.random()/100;
-  var noise_g = Math.random()/100;
-  var noise_b = Math.random()/100;
-  rcState1_color.value.set(color_0.x+noise_r, color_0.y+noise_g, color_0.z+noise_b);
-  rcState2_color.value.set(color_1.x+noise_r, color_1.y+noise_g, color_1.z+noise_b);
-  rcState3_color.value.set(color_2.x+noise_r, color_2.y+noise_g, color_2.z+noise_b);
+  var noise_r = Math.random()/10;
+  var noise_g = Math.random()/10;
+  var noise_b = Math.random()/10;
+  rcState1_color.value.set(1.0+noise_r, 0.0+noise_g, 0.0+noise_b);
+  rcState2_color.value.set(0.0+noise_r, 1.0+noise_g, 0.0+noise_b);
+  rcState3_color.value.set(0.0+noise_r, 0.0+noise_g, 1.0+noise_b);
   racoonMaterial.needsUpdate = true; // Tells three.js that some uniforms might have changed
   remoteMaterial.needsUpdate = true;
 }
