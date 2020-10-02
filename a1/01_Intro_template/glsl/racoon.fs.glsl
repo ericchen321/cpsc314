@@ -17,7 +17,7 @@ void main() {
   // Set final rendered color according to the surface normal
   float threshold = 2.8;
 
-  float alpha = exp(-1.0 * interpolatedDist);
+  float alpha = 1.0 / (interpolatedDist - 1.0);
 
   if (interpolatedDist < threshold) {
     if (rcState == 1) {

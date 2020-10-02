@@ -72,6 +72,7 @@ var rcState2_color = {type: 'v3', value: new THREE.Vector3(0,1,0)};
 var rcState3_color = {type: 'v3', value: new THREE.Vector3(0,0,1)};
 var timeInit = Date.now();
 var timeElapsed = {type: 'f', value: 0.0}
+var enableExplosion = {type: 'i', value: 0};
 
 // MATERIALS
 /* HINT: YOU WILL NEED TO SHARE VARIABLES FROM HERE */
@@ -84,6 +85,7 @@ var racoonMaterial = new THREE.ShaderMaterial({
     rcState1_color: rcState1_color,
     rcState2_color: rcState2_color,
     rcState3_color: rcState3_color,
+    enableExplosion: enableExplosion,
   }
 });
 racoonMaterial.transparent = true;
@@ -179,6 +181,11 @@ function checkKeyboard() {
     remotePosition.value.y += 0.1;
   else if (keyboard.pressed("S"))
     remotePosition.value.y -= 0.1;
+  
+  if (keyboard.pressed("E"))
+    enableExplosion.value = 1;
+  else if (keyboard.pressed("R"))
+    enableExplosion.value = 0;
 
   for (var i=1; i<4; i++)
   {

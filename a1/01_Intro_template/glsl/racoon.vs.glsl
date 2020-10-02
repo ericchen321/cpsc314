@@ -6,6 +6,7 @@ varying float interpolatedDist;
 uniform float distObjToFloor;
 uniform vec3 remotePosition;
 uniform float timeElapsed;
+uniform int enableExplosion;
 
 #define PI 3.1416
 #define SCALE 7.0
@@ -24,6 +25,9 @@ void main() {
     // Compute position in world frame
     vec4 position_world_untranslated = modelMatrix * scaleMatrix * vec4(position, 1.0);
     vec4 position_world = vec4(position_world_untranslated.x, position_world_untranslated.y-distObjToFloor, position_world_untranslated.z, 1.0);
+    if (enableExplosion == 1) {
+        position_world = position_world + 4.0 * vec4(normal, 1.0);
+    }
 
     // Compute distance from vertex to remote's centre
     interpolatedDist = distance(position_world, vec4(remotePosition, 1.0));
