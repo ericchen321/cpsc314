@@ -35,7 +35,7 @@ void main() {
     float g_factor = sin(2.0*PI*(1.0/PERIOD)*timeElapsed);
     float b_factor = g_factor;
     vec3 color_vec = vec3(interpolatedNormal.x*r_factor, interpolatedNormal.y*g_factor, interpolatedNormal.z*b_factor);
-    gl_FragColor = vec4(normalize(color_vec), 1.0);
+    gl_FragColor = vec4(normalize(color_vec), alpha);
   }
 
   //gl_FragColor = vec4(normalize(interpolatedNormal), 1.0); // REPLACE ME
