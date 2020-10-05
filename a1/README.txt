@@ -1,6 +1,6 @@
 Guanxiong Chen
 13108155
-ericc321
+i0y0b
 
 Part 2 added effects:
 - set racoon's size to change sinusoidally with time
