@@ -356,6 +356,69 @@ function animateArm(t, arm, angle_Y, angle_Z, socketPosition) {
    *       sine t, then we have a periodic effect
    *       var rotation = defineRotation_{AXIS}(f(sin(t)))
   */
+  var armMoveAmplitude = 15; // amplitude of arm movement in degree
+
+  // Add joint1
+  var joint1T = defineTranslation(socketPosition[0], socketPosition[1], socketPosition[2]);
+  var joint1R_y = defineRotation_Y(angle_Y);
+  var joint1R_z = defineRotation_Z(angle_Z);
+  var joint1TR = new THREE.Matrix4().multiplyMatrices(
+    joint1T,
+    new THREE.Matrix4().multiplyMatrices(joint1R_y, joint1R_z)
+  )
+  var joint1Mtx = new THREE.Matrix4().multiplyMatrices(
+    octopusMatrix.value,
+    joint1TR
+  );
+  joint1.setMatrix(joint1Mtx);
+
+  // Add link1
+  var link1Theta = Math.PI * (Math.sin(2*Math.PI*t/5.0)*armMoveAmplitude)/180.0;
+  var link1R = defineRotation_Z(link1Theta)
+  var link1T = defineTranslation(0.0, 1.2, 0.0);
+  var link1Mtx = new THREE.Matrix4().multiplyMatrices(
+    joint1Mtx,
+    new THREE.Matrix4().multiplyMatrices(link1R, link1T)
+  );
+  link1.setMatrix(link1Mtx);
+  
+  // Add joint2
+  var joint2T = defineTranslation(0.0, 1.2, 0.0);
+  var joint2Mtx = new THREE.Matrix4().multiplyMatrices(
+    link1Mtx,
+    joint2T
+  );
+  joint2.setMatrix(joint2Mtx);
+
+  // Add link2
+  var link2Theta = Math.PI * (Math.sin(2*Math.PI*t/5.0 + Math.PI/2)*armMoveAmplitude)/180.0;
+  var link2R = defineRotation_Z(link2Theta)
+  var link2T = defineTranslation(0.0, 1.22, 0.0);
+  var link2Mtx = new THREE.Matrix4().multiplyMatrices(
+    joint2Mtx,
+    new THREE.Matrix4().multiplyMatrices(link2R, link2T)
+  );
+  link2.setMatrix(link2Mtx);
+
+  // Add joint3
+  var joint3T = defineTranslation(0.0, 1.1, 0.0);
+  var joint3Mtx = new THREE.Matrix4().multiplyMatrices(
+    link2Mtx,
+    joint3T
+  );
+  joint3.setMatrix(joint3Mtx);
+
+  // Add link3
+  var link3Theta = Math.PI * (Math.sin(2*Math.PI*t/5.0 - Math.PI/4)*armMoveAmplitude)/180.0;
+  var link3R = defineRotation_Z(link3Theta)
+  var link3T = defineTranslation(0.0, 1.1, 0.0);
+  var link3Mtx = new THREE.Matrix4().multiplyMatrices(
+    joint3Mtx,
+    new THREE.Matrix4().multiplyMatrices(link3R, link3T)
+  );
+  link3.setMatrix(link3Mtx);
+
+  return;
 }
 
 var clock = new THREE.Clock(true);
@@ -426,15 +489,45 @@ function updateBody() {
         );
         //***** Q3.a *****//
         // Animate Right Eye (eyeball and pupil)
-        
+        eyeball_R.setMatrix(new THREE.Matrix4().multiplyMatrices(
+          octopusMatrix.value,
+          eyeballTS_R
+        ));
+        pupil_R.setMatrix(new THREE.Matrix4().multiplyMatrices(
+          new THREE.Matrix4().multiplyMatrices(
+            octopusMatrix.value,
+            eyeballTS_R
+          ),
+          new THREE.Matrix4().multiplyMatrices(
+            defineRotation_Y(theta_R),
+            pupilTS_R
+          )
+        ));
+        //scene.add(eyeball_R);
+        //scene.add(pupil_R);
         // Animate Left Eye (eyeball and pupil)
-        
+        eyeball_L.setMatrix(new THREE.Matrix4().multiplyMatrices(
+          octopusMatrix.value,
+          eyeballTS_L
+        ));
+        pupil_L.setMatrix(new THREE.Matrix4().multiplyMatrices(
+          new THREE.Matrix4().multiplyMatrices(
+            octopusMatrix.value,
+            eyeballTS_L
+          ),
+          new THREE.Matrix4().multiplyMatrices(
+            defineRotation_Y(theta_L),
+            pupilTS_L
+          )
+        ));
+        //scene.add(eyeball_L);
+        //scene.add(pupil_L);
         // Animate Arms
         //***** Q3.c *****//
         animateArm(t, arm1, Math.PI*(-135/180), Math.PI*(-0.5), socketPos1);
-        // animateArm(t, arm2, angleY,  angleZ, socketPos2);
-        // animateArm(t, arm3, angleY,  angleZ, socketPos3);
-        // animateArm(t, arm4, angleY,  angleZ, socketPos4);
+        animateArm(t, arm2, Math.PI*(-45/180), Math.PI*(-0.5), socketPos2);
+        animateArm(t, arm3, Math.PI*(45/180), Math.PI*(-0.5), socketPos3);
+        animateArm(t, arm4, Math.PI*(135/180), Math.PI*(-0.5), socketPos4);
       }
 
       break;
