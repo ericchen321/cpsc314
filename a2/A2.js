@@ -31,6 +31,9 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
+// FIXME: WORLD COORDINATE FRAME: other objects are defined with respect to it
+var worldFrame = new THREE.AxisHelper(5) ;
+scene.add(worldFrame);
 // FLOOR WITH CHECKERBOARD 
 var floorTexture = new THREE.ImageUtils.loadTexture('images/checkerboard.jpg');
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
@@ -132,6 +135,15 @@ function defineRotation_Z(theta) {
   );
   return mtx;
 }
+function defineTranslation(dx, dy, dz) {
+  var mtx = new THREE.Matrix4().set(
+    1.0,       0.0,       0.0,       dx, 
+    0.0,       1.0,       0.0,       dy, 
+    0.0,       0.0,       1.0,       dz, 
+    0.0,       0.0,       0.0,       1.0
+  );
+  return mtx;
+}
 //************************************************//
 function addEyeAndPupil(material, eyeballTS, pupilTS, pupilTheta) {
   var eyegeo = new THREE.SphereGeometry(1.0,64,64);
@@ -225,7 +237,18 @@ function addOneArm(angle_Y, angle_Z, socketPosition) {
    * Hint: You also need to translate joint1
   */
   var joint1 = new THREE.Mesh(j1, normalMaterial);
-  //joint1.setMatrix(COMPUTED MATRIX);
+  var joint1T = defineTranslation(socketPosition[0], socketPosition[1], socketPosition[2]);
+  var joint1R_y = defineRotation_Y(angle_Y);
+  var joint1R_z = defineRotation_Z(angle_Z);
+  var joint1TR = new THREE.Matrix4().multiplyMatrices(
+    joint1T,
+    new THREE.Matrix4().multiplyMatrices(joint1R_y, joint1R_z)
+  )
+  var joint1Mtx = new THREE.Matrix4().multiplyMatrices(
+    octopusMatrix.value,
+    joint1TR
+  );
+  joint1.setMatrix(joint1Mtx);
   scene.add(joint1);
 
   // Add link1
@@ -233,27 +256,52 @@ function addOneArm(angle_Y, angle_Z, socketPosition) {
    *       link is connected with joints, without overlaping
    */
   var link1 = new THREE.Mesh(l1, normalMaterial);
-  //link1.setMatrix(COMPUTED MATRIX);
+  var link1T = defineTranslation(0.0, 1.2, 0.0);
+  var link1Mtx = new THREE.Matrix4().multiplyMatrices(
+    joint1Mtx,
+    link1T
+  );
+  link1.setMatrix(link1Mtx);
   scene.add(link1);
   
   // Add joint2
   var joint2 = new THREE.Mesh(j2, normalMaterial);
-  //joint2.setMatrix(COMPUTED MATRIX);
+  var joint2T = defineTranslation(0.0, 1.2, 0.0);
+  var joint2Mtx = new THREE.Matrix4().multiplyMatrices(
+    link1Mtx,
+    joint2T
+  );
+  joint2.setMatrix(joint2Mtx);
   scene.add(joint2);
 
   // Add link2
   var link2 = new THREE.Mesh(l2, normalMaterial);
-  //link2.setMatrix(COMPUTED MATRIX);
+  var link2T = defineTranslation(0.0, 1.22, 0.0);
+  var link2Mtx = new THREE.Matrix4().multiplyMatrices(
+    joint2Mtx,
+    link2T
+  );
+  link2.setMatrix(link2Mtx);
   scene.add(link2);
 
   // Add joint3
   var joint3 = new THREE.Mesh(j3, normalMaterial);
-  //joint3.setMatrix(COMPUTED MATRIX);
+  var joint3T = defineTranslation(0.0, 1.1, 0.0);
+  var joint3Mtx = new THREE.Matrix4().multiplyMatrices(
+    link2Mtx,
+    joint3T
+  );
+  joint3.setMatrix(joint3Mtx);
   scene.add(joint3);
 
   // Add link3
   var link3 = new THREE.Mesh(l3, normalMaterial);
-  //link3.setMatrix(COMPUTED MATRIX);
+  var link3T = defineTranslation(0.0, 1.1, 0.0);
+  var link3Mtx = new THREE.Matrix4().multiplyMatrices(
+    joint3Mtx,
+    link3T
+  );
+  link3.setMatrix(link3Mtx);
   scene.add(link3);
 
   return [joint1, link1, joint2, link2, joint3, link3];
@@ -272,9 +320,9 @@ socketPos3 = [2.4, -0.35, -2.4];
 socketPos4 = [-2.4, -0.35, -2.4];
 //***** Q2 *****//
 var arm1 = addOneArm(Math.PI*(-135/180), Math.PI*(-0.5), socketPos1);
-//var arm2 = addOneArm(Math.PI*(angleY), Math.PI*(angleZ), socketPos2);
-//var arm3 = addOneArm(Math.PI*(angleY), Math.PI*(angleZ), socketPos3);
-//var arm4 = addOneArm(Math.PI*(angleY), Math.PI*(angleZ), socketPos4);
+var arm2 = addOneArm(Math.PI*(-45/180), Math.PI*(-0.5), socketPos2);
+var arm3 = addOneArm(Math.PI*(45/180), Math.PI*(-0.5), socketPos3);
+var arm4 = addOneArm(Math.PI*(135/180), Math.PI*(-0.5), socketPos4);
 
 //***** Q3.b *****/
 function animateArm(t, arm, angle_Y, angle_Z, socketPosition) {
