@@ -213,13 +213,22 @@ pupil_R = righteye[1];
 // Each arm starts with a joint and ends with a link
 // joint-link-joint-link-joint-link
 
+// some useful constants
+const LINK_LENGTH = 2; // length of links
+// transformations along local y axis for each joint/link w.r.t its parent
+const LINK1_SHIFT = 1.2;
+const JOINT2_SHIFT =  1.2;
+const LINK2_SHIFT = 1.22;
+const JOINT3_SHIFT = 1.1;
+const LINK3_SHIFT = 1.1;
+
 // Geometries of the arm
 var j1 = new THREE.SphereGeometry(0.5,64,64);
-var l1 = new THREE.CylinderGeometry(0.35, 0.45, 2, 64);
+var l1 = new THREE.CylinderGeometry(0.35, 0.45, LINK_LENGTH, 64);
 var j2 = new THREE.SphereGeometry(0.4, 64, 64);
-var l2 = new THREE.CylinderGeometry(0.25, 0.35, 2, 64);
+var l2 = new THREE.CylinderGeometry(0.25, 0.35, LINK_LENGTH, 64);
 var j3 = new THREE.SphereGeometry(0.3, 64, 64);
-var l3 = new THREE.CylinderGeometry(0.1, 0.25, 2, 64);
+var l3 = new THREE.CylinderGeometry(0.1, 0.25, LINK_LENGTH, 64);
 
 // ***** Q1 *****//
 function addOneArm(angle_Y, angle_Z, socketPosition) {
@@ -256,7 +265,7 @@ function addOneArm(angle_Y, angle_Z, socketPosition) {
    *       link is connected with joints, without overlaping
    */
   var link1 = new THREE.Mesh(l1, normalMaterial);
-  var link1T = defineTranslation(0.0, 1.2, 0.0);
+  var link1T = defineTranslation(0.0, LINK1_SHIFT, 0.0);
   var link1Mtx = new THREE.Matrix4().multiplyMatrices(
     joint1Mtx,
     link1T
@@ -266,7 +275,7 @@ function addOneArm(angle_Y, angle_Z, socketPosition) {
   
   // Add joint2
   var joint2 = new THREE.Mesh(j2, normalMaterial);
-  var joint2T = defineTranslation(0.0, 1.2, 0.0);
+  var joint2T = defineTranslation(0.0, JOINT2_SHIFT, 0.0);
   var joint2Mtx = new THREE.Matrix4().multiplyMatrices(
     link1Mtx,
     joint2T
@@ -276,7 +285,7 @@ function addOneArm(angle_Y, angle_Z, socketPosition) {
 
   // Add link2
   var link2 = new THREE.Mesh(l2, normalMaterial);
-  var link2T = defineTranslation(0.0, 1.22, 0.0);
+  var link2T = defineTranslation(0.0, LINK2_SHIFT, 0.0);
   var link2Mtx = new THREE.Matrix4().multiplyMatrices(
     joint2Mtx,
     link2T
@@ -286,7 +295,7 @@ function addOneArm(angle_Y, angle_Z, socketPosition) {
 
   // Add joint3
   var joint3 = new THREE.Mesh(j3, normalMaterial);
-  var joint3T = defineTranslation(0.0, 1.1, 0.0);
+  var joint3T = defineTranslation(0.0, JOINT3_SHIFT, 0.0);
   var joint3Mtx = new THREE.Matrix4().multiplyMatrices(
     link2Mtx,
     joint3T
@@ -296,7 +305,7 @@ function addOneArm(angle_Y, angle_Z, socketPosition) {
 
   // Add link3
   var link3 = new THREE.Mesh(l3, normalMaterial);
-  var link3T = defineTranslation(0.0, 1.1, 0.0);
+  var link3T = defineTranslation(0.0, LINK3_SHIFT, 0.0);
   var link3Mtx = new THREE.Matrix4().multiplyMatrices(
     joint3Mtx,
     link3T
@@ -423,6 +432,166 @@ function animateArm(t, arm, angle_Y, angle_Z, socketPosition) {
 
 var clock = new THREE.Clock(true);
 var initalMtx = octopusMatrix.value;
+
+// computes joint position given a 2-DOF IK problem
+// returns the joint position
+function computeJointPos(l1Pos, l1Length, l2Length, endPos, upVec) {
+  var vecA = new THREE.Vector3(endPos.x-l1Pos.x, endPos.y-l1Pos.y, endPos.z-l1Pos.z);
+  //console.log("vecA is " + vecA.x + " " + vecA.y + " " + vecA.z)
+  var A = vecA.length()
+  //console.log("A is " + A)
+  var O_S2 = A - l2Length;
+  var C = l1Length - O_S2;
+  var B = O_S2 + 0.5*C;
+  var D = B*C/A;
+  //console.log("D is " + D)
+  
+  var j = vecA;
+  j.normalize();
+  j.multiplyScalar(O_S2+D)
+  j.add(l1Pos);
+  //console.log("j is " + j.x + " " + j.y + " " + j.z)
+
+  var planeNormal = new THREE.Vector3();
+  planeNormal.crossVectors(vecA, upVec);
+
+  var jVec = new THREE.Vector3();
+  jVec.crossVectors(planeNormal, vecA);
+  jVec.normalize();
+  //console.log("jVec is " + jVec.x + " " + jVec.y + " " + jVec.z)
+  //console.log('l1^2 is ' + Math.pow(l1Length, 2))
+  //console.log('(O_S2+D)^2 is ' + Math.pow((O_S2+D), 2))
+  oppoLeg = Math.sqrt(Math.pow(l1Length, 2) - Math.pow((O_S2+D), 2));
+  //console.log("oppoLeg is " + oppoLeg)
+
+  var jointPos = jVec;
+  jointPos.multiplyScalar(oppoLeg);
+  jointPos.add(j);
+  //console.log("joint pos: " + jointPos.x + " " + jointPos.y + " " + jointPos.z)
+  return jointPos;
+}
+
+// Computes look-at transformation matrix from start (joint) position,
+// end effector position, up vector
+// returns the matrix 
+function computeLookAtTransform(startPos, endPos, upVec) {
+  lookAtVec = new THREE.Vector3(endPos.x-startPos.x, endPos.y-startPos.y, endPos.z-startPos.z);
+  lookAtVec.normalize();
+  /*
+  col1 = new THREE.Vector3();
+  col1.crossVectors(upVec, lookAtVec);
+  col1.normalize();
+
+  col2 = new THREE.Vector3();
+  col2.crossVectors(lookAtVec, col1);
+  col2.normalize();
+  
+  lookAtMat = new THREE.Matrix4().set(
+    col1.x,  col2.x,   lookAtVec.x,  startPos.x, 
+    col1.y,  col2.y,   lookAtVec.y,  startPos.y, 
+    col1.z,  col2.z,   lookAtVec.z,  startPos.z, 
+    0.0,     0.0,      0.0,          1.0
+  );
+  */
+  //console.log(lookAtMat);
+
+  col3 = new THREE.Vector3();
+  col3.crossVectors(lookAtVec, upVec);
+  col3.normalize();
+  
+  col1 = new THREE.Vector3();
+  col1.crossVectors(lookAtVec, col3);
+  col1.normalize();
+  
+  lookAtMat = new THREE.Matrix4().set(
+    col1.x,  lookAtVec.x,  col3.x,  startPos.x, 
+    col1.y,  lookAtVec.y,  col3.y,  startPos.y, 
+    col1.z,  lookAtVec.z,  col3.z,  startPos.z, 
+    0.0,     0.0,          0.0,     1.0
+  );
+  
+  /*
+  lookAtMat = new THREE.Matrix4().set(
+    1.0,  0.0,   0.0,  0.0, 
+    0.0,  1.0,   0.0,  0.0, 
+    0.0,  0.0,   1.0,  0.0, 
+    0.0,  0.0,   0.0,  1.0
+  );
+  */
+  
+  return lookAtMat;
+}
+
+// animate walking of an entire arm. socketPos allows computing
+// the length of an imaginary link from the origin to joint 1,
+// so we can compute joint 1's position;
+// returns joint1's position
+function animateArmWalking(arm, upVector, socketPos, tipPos) {
+  joint1 = arm[0];
+  link1 = arm[1];
+  joint2 = arm[2];
+  link2 = arm[3];
+  joint3 = arm[4];
+  link3 = arm[5];
+
+  //console.log("socket pos: " + socketPos.x + " " + socketPos.y + " " + socketPos.z)
+  //console.log("tip pos: " + tipPos.x + " " + tipPos.y + " " + tipPos.z)
+
+  // compute virtual link 1's length
+  var v1_min = 0.0
+  var v1_max = 2.0 * LINK_LENGTH + socketPos.length();
+  var OP_max = 3.0 * LINK_LENGTH + socketPos.length();
+  var OPVec = tipPos;
+  var OP = OPVec.length();
+  var v1Length = (v1_max - v1_min)* OP/OP_max + v1_min;
+  //console.log("v1Length: " + v1Length);
+
+  // compute virtual link 2's length
+  var v2_min = 0.0
+  var v2_max = 1.0 * LINK_LENGTH + socketPos.length()
+  var v2Length = (v2_max - v2_min)* OP/OP_max + v2_min;
+  //console.log("v2Length: " + v2Length);
+
+  // compute l_0's length
+  var l0_min = 0.0
+  var l0_max = socketPos.length()
+  var l0Length = (l0_max - l0_min)* OP/OP_max + l0_min; 
+
+  // compute joint3 position
+  var joint3Pos = computeJointPos(new THREE.Vector3(0.0, 0.0, 0.0), v1Length, LINK_LENGTH, tipPos, upVector);
+  //console.log("joint3 pos: " + joint3Pos.x + " " + joint3Pos.y + " " + joint3Pos.z)
+  // set transformation matrix for joint3
+  var joint3Mtx = defineTranslation(joint3Pos.x, joint3Pos.y, joint3Pos.z);
+  // set transformation matrix for link3
+  var link3Mtx = computeLookAtTransform(joint3Pos, tipPos, upVector);
+  //console.log(link3Mtx);
+
+  // compute joint2 position
+  var joint2Pos = computeJointPos(new THREE.Vector3(0.0, 0.0, 0.0), v2Length, LINK_LENGTH, joint3Pos, upVector);
+  //console.log("joint2 pos: " + joint2Pos.x + " " + joint2Pos.y + " " + joint2Pos.z);
+  // set transformation matrix for joint2
+  var joint2Mtx = defineTranslation(joint2Pos.x, joint2Pos.y, joint2Pos.z);
+  // set transformation matrix for link2
+  var link2Mtx = computeLookAtTransform(joint2Pos, joint3Pos, upVector);
+
+  // compute joint1 position
+  var joint1Pos = computeJointPos(new THREE.Vector3(0.0, 0.0, 0.0), l0Length, LINK_LENGTH, joint2Pos, upVector);
+  //console.log("joint1 pos: " + joint1Pos.x + " " + joint1Pos.y + " " + joint1Pos.z);
+  // set transformation matrix for joint1
+  var joint1Mtx = defineTranslation(joint1Pos.x, joint1Pos.y, joint1Pos.z);
+  // set transformation matrix for link1
+  var link1Mtx = computeLookAtTransform(joint1Pos, joint2Pos, upVector);
+
+  joint3.setMatrix(joint3Mtx);
+  link3.setMatrix(new THREE.Matrix4().multiplyMatrices(link3Mtx, defineTranslation(0.0, LINK3_SHIFT, 0.0)));
+  joint2.setMatrix(joint2Mtx);
+  link2.setMatrix(new THREE.Matrix4().multiplyMatrices(link2Mtx, defineTranslation(0.0, LINK2_SHIFT, 0.0)));
+  joint1.setMatrix(joint1Mtx);
+  link1.setMatrix(new THREE.Matrix4().multiplyMatrices(link1Mtx, defineTranslation(0.0, LINK1_SHIFT, 0.0)));
+
+  return joint1Pos;
+}
+
 function updateBody() {
   switch(channel)
   {
@@ -528,6 +697,55 @@ function updateBody() {
         animateArm(t, arm2, Math.PI*(-45/180), Math.PI*(-0.5), socketPos2);
         animateArm(t, arm3, Math.PI*(45/180), Math.PI*(-0.5), socketPos3);
         animateArm(t, arm4, Math.PI*(135/180), Math.PI*(-0.5), socketPos4);
+      }
+
+      break;
+      
+    // inverse kinematics
+    case 4:
+      {
+        var upVector = new THREE.Vector3(0.0, 1.0, 0.0); // moving in x-y plane
+        var t = clock.getElapsedTime();
+
+        var xInit_14 = -6.4;
+        var xInit_23 = 6.4;
+        var zInit_12 = socketPos1[2]+2.0;
+        var zInit_34 = socketPos3[2];
+
+        // IK for arm 1
+        var socketPos1Vec = new THREE.Vector3(socketPos1[0], socketPos1[1], socketPos1[2]);
+        socketPos1Vec.applyMatrix4(initalMtx);
+        var tipPosArm1 = new THREE.Vector3(xInit_14+Math.cos(t/1.1), Math.abs(Math.sin(t/1.1)*1.2), zInit_12);
+        var joint1Pos = animateArmWalking(arm1, upVector, socketPos1Vec, tipPosArm1);
+        //var octTrans = joint1Pos;
+        //octTrans.sub(socketPos1Vec);
+        //console.log('octTrans is ' + octTrans.x + ' ' + octTrans.y + ' ' + octTrans.z)
+        //var octopusMatrixTrans = new THREE.Matrix4().multiplyMatrices(defineTranslation(octTrans.x, octTrans.y, octTrans.z), initalMtx);
+        //octopusMatrix.value = octopusMatrixTrans;
+        
+        // IK for arm 2
+        var socketPos2Vec = new THREE.Vector3(socketPos2[0], socketPos2[1], socketPos2[2]);
+        socketPos2Vec.applyMatrix4(initalMtx);
+        //console.log('socketPos2Vec is ' + socketPos2Vec.x + ' ' + socketPos2Vec.y + ' ' + socketPos2Vec.z)
+        var tipPosArm2 = new THREE.Vector3(xInit_23+Math.cos(t/1.1), Math.abs(Math.sin(t/1.1)*1.2), zInit_12);
+        console.log("tip pos arm2: " + tipPosArm2.x + " " + tipPosArm2.y + " " + tipPosArm2.z)
+        var joint2Pos = animateArmWalking(arm2, upVector, socketPos2Vec, tipPosArm2);
+        
+        // IK for arm 3
+        var socketPos3Vec = new THREE.Vector3(socketPos3[0], socketPos3[1], socketPos3[2]);
+        socketPos3Vec.applyMatrix4(initalMtx);
+        //console.log('socketPos2Vec is ' + socketPos2Vec.x + ' ' + socketPos2Vec.y + ' ' + socketPos2Vec.z)
+        var tipPosArm3 = new THREE.Vector3(xInit_23+Math.cos(t/1.1), Math.abs(Math.sin(t/1.1)*1.2), zInit_34);
+        console.log("tip pos arm3: " + tipPosArm3.x + " " + tipPosArm3.y + " " + tipPosArm3.z)
+        var joint3Pos = animateArmWalking(arm3, upVector, socketPos3Vec, tipPosArm3);
+        
+        // IK for arm 4
+        var socketPos4Vec = new THREE.Vector3(socketPos4[0], socketPos4[1], socketPos4[2]);
+        socketPos4Vec.applyMatrix4(initalMtx);
+        //console.log('socketPos2Vec is ' + socketPos2Vec.x + ' ' + socketPos2Vec.y + ' ' + socketPos2Vec.z)
+        var tipPosArm4 = new THREE.Vector3(xInit_14+Math.cos(t/1.1), Math.abs(Math.sin(t/1.1)*1.2), zInit_34);
+        console.log("tip pos arm4: " + tipPosArm4.x + " " + tipPosArm4.y + " " + tipPosArm4.z)
+        var joint4Pos = animateArmWalking(arm4, upVector, socketPos4Vec, tipPosArm4);
       }
 
       break;
