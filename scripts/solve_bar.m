@@ -1,6 +1,8 @@
 # solves barycentric coordinates alpha, beta and gamma
+# from pt coordinates a, b, c, p;
+# returns barycentric coordinates as a row vector
 # requires 3-vectors as inputs
-function bar_values = solve_bar (a, b, c, p)
+function bar_values = solve_bar_coords (a, b, c, p)
   ab = b-a;
   ac = c-a;
   pb = b-p;
@@ -15,6 +17,18 @@ function bar_values = solve_bar (a, b, c, p)
   alpha = Aa/At;
   beta = Ab/At;
   gama = Ac/At;
-  bar_values = [alpha; beta; gama];
+  bar_values = [alpha beta gama];
+  if (sum(bar_values)<(1.0-0.05) || sum(bar_values)>(1.0+0.05))
+    printf("sum of barycentric coordinates is: %f\n", sum(bar_values));
+    error("point is outside the given triangle!");
+  endif
+  return;
+endfunction
+
+# solves interpolated value using pt values and barycentric
+# coordinates
+# requires row vectors as inputs
+function interpolated = solve_bar_interpolation (a, b, c, bar_values)
+  interpolated = sum(([bar_values; bar_values; bar_values].*[a' b' c']), 2);
   return;
 endfunction
