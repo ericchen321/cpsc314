@@ -40,7 +40,7 @@ void main() {
 		// compute reflection vector
 		vec3 reflectVec = reflect(-1.0*lightVec, normalVec);
 		// compute view vector
-		vec3 viewVec = -1.0*vertPos;
+		vec3 viewVec = normalize(-1.0*vertPos);
 		specAmount = pow(max(0.0, dot(reflectVec,viewVec)), shininess);
 	}
 	else {

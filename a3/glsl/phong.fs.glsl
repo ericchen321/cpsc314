@@ -20,7 +20,7 @@ void main() {
 	vec3 lightPos = vec3(lightPos4D) / lightPos4D.w;
 
 	// get fragment normal in camera frame in 3D
-	vec3 normalVec = vec3(V_Normal_VCS);
+	vec3 normalVec = normalize(vec3(V_Normal_VCS));
 
 	// compute light vector
 	vec3 lightVec = normalize(lightPos - fragPos);
@@ -40,7 +40,7 @@ void main() {
 		// compute reflection vector
 		vec3 reflectVec = reflect(-1.0*lightVec, normalVec);
 		// compute view vector
-		vec3 viewVec = -1.0*fragPos;
+		vec3 viewVec = normalize(-1.0*fragPos);
 		specAmount = pow(max(0.0, dot(reflectVec,viewVec)), shininess);
 	}
 	else {

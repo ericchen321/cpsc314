@@ -39,7 +39,7 @@ void main() {
 	float specAmount;
 	if (lambertian > 0.0) {
 		// compute view vector
-		vec3 viewVec = -1.0*fragPos;
+		vec3 viewVec = normalize(-1.0*fragPos);
 		// compute half vector
 		vec3 halfVec = 0.5 * (lightVec+viewVec);
 		specAmount = pow(max(0.0, dot(normalVec, halfVec)), shininess);
