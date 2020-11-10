@@ -26,12 +26,12 @@ void main() {
 	vec3 lightVec = normalize(lightPos - vertPos);
 
 	// compute ambient component
-	vec4 ambient = vec4(kAmbient*ambientColor, 1.0);
+	vec3 ambient = kAmbient*ambientColor;
 	
 	// compute diffuse component
 	// compute lambertian value
 	float lambertian = max(dot(normalVec, lightVec), 0.0);
-	vec4 diffuse = vec4(kDiffuse*lambertian*lightColor, 1.0);
+	vec3 diffuse = kDiffuse*lambertian*lightColor;
 
 	// compute specular component
 	// compute specular amount
@@ -46,10 +46,10 @@ void main() {
 	else {
 		specAmount = 0.0;
 	}
-	vec4 specular = vec4(kSpecular*specAmount*lightColor, 1.0);
+	vec3 specular = kSpecular*specAmount*lightColor;
 
 	// compute vertex color
-	V_Color = ambient + diffuse + specular;
+	V_Color = vec4((ambient + diffuse + specular), 1.0);
 
 	// Position
 	gl_Position = projectionMatrix *  modelViewMatrix * vec4(position, 1.0);
