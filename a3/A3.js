@@ -78,7 +78,17 @@ var phongMaterial = new THREE.ShaderMaterial({
     shininess: shininess,
   }
 });
-var blinnPhongMaterial = new THREE.ShaderMaterial();
+var blinnPhongMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    lightColor: lightColor,
+    ambientColor: ambientColor,
+    lightPosition: lightPosition,
+    kAmbient: kAmbient,
+    kDiffuse: kDiffuse,
+    kSpecular: kSpecular,
+    shininess: shininess,
+  }
+});
 var textureMaterial = new THREE.ShaderMaterial();
 
 // LOAD SHADERS
