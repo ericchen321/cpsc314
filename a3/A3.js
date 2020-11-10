@@ -42,12 +42,12 @@ floor.rotation.x = Math.PI / 2;
 scene.add(floor);
 
 //TEXTURES
-var rocksTexture =  new THREE.ImageUtils.loadTexture('images/gravel-rocks-texture.jpg');
+var rocksTexture =  {type: "t", value: new THREE.ImageUtils.loadTexture('images/gravel-rocks-texture.jpg')};
 
 //LIGHTING PROPERTIES
 var lightColor = {type: "c", value: new THREE.Color(1.0,1.0,1.0)};
 var ambientColor = {type: "c", value: new THREE.Color(0.4,0.4,0.4)};
-var lightPosition = {type: "v3", value: new THREE.Vector3(0.49,0.79,0.49)};
+var lightDirection = {type: "v3", value: new THREE.Vector3(0.49,0.79,0.49)};
 
 //MATERIAL PROPERTIES 
 var kAmbient = {type: "f", value: 0.4 };
@@ -60,7 +60,7 @@ var gouraudMaterial = new THREE.ShaderMaterial({
   uniforms: {
     lightColor: lightColor,
     ambientColor: ambientColor,
-    lightPosition: lightPosition,
+    lightDirection: lightDirection,
     kAmbient: kAmbient,
     kDiffuse: kDiffuse,
     kSpecular: kSpecular,
@@ -71,7 +71,7 @@ var phongMaterial = new THREE.ShaderMaterial({
   uniforms: {
     lightColor: lightColor,
     ambientColor: ambientColor,
-    lightPosition: lightPosition,
+    lightDirection: lightDirection,
     kAmbient: kAmbient,
     kDiffuse: kDiffuse,
     kSpecular: kSpecular,
@@ -82,14 +82,18 @@ var blinnPhongMaterial = new THREE.ShaderMaterial({
   uniforms: {
     lightColor: lightColor,
     ambientColor: ambientColor,
-    lightPosition: lightPosition,
+    lightDirection: lightDirection,
     kAmbient: kAmbient,
     kDiffuse: kDiffuse,
     kSpecular: kSpecular,
     shininess: shininess,
   }
 });
-var textureMaterial = new THREE.ShaderMaterial();
+var textureMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    rocksTexture: rocksTexture,
+  }
+});
 
 // LOAD SHADERS
 var shaderFiles = [

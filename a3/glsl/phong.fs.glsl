@@ -1,6 +1,6 @@
 uniform vec3 lightColor;
 uniform vec3 ambientColor;
-uniform vec3 lightPosition;
+uniform vec3 lightDirection;
 uniform float kAmbient;
 uniform float kDiffuse;
 uniform float kSpecular;
@@ -15,15 +15,12 @@ void main() {
 	// get fragement position in camera frame in 3D
 	vec3 fragPos = vec3(V_ViewPosition);
 
-	// compute light position in camera frame in 3D
-	vec4 lightPos4D = viewMatrix * vec4(lightPosition, 1.0);
-	vec3 lightPos = vec3(lightPos4D) / lightPos4D.w;
+	// compute light vector (light direction in camera frame in 3D)
+	vec4 lightDir4D = viewMatrix * vec4(lightDirection, 0.0);
+	vec3 lightVec = normalize(vec3(lightDir4D));
 
 	// get fragment normal in camera frame in 3D
 	vec3 normalVec = normalize(vec3(V_Normal_VCS));
-
-	// compute light vector
-	vec3 lightVec = normalize(lightPos - fragPos);
 
 	// compute ambient component
 	vec3 ambient = kAmbient*ambientColor;

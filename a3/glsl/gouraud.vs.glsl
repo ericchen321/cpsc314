@@ -1,6 +1,6 @@
 uniform vec3 lightColor;
 uniform vec3 ambientColor;
-uniform vec3 lightPosition; // world frame light pos
+uniform vec3 lightDirection; // world frame light pos
 uniform float kAmbient;
 uniform float kDiffuse;
 uniform float kSpecular;
@@ -15,15 +15,12 @@ void main() {
 	vec4 vertPos4D = modelViewMatrix * vec4(position, 1.0);
 	vec3 vertPos = vec3(vertPos4D) / vertPos4D.w;
 
-	// compute light position in camera frame in 3D
-	vec4 lightPos4D = viewMatrix * vec4(lightPosition, 1.0);
-	vec3 lightPos = vec3(lightPos4D) / lightPos4D.w;
+	// compute light vec (light direction in camera frame in 3D)
+	vec4 lightDir4D = viewMatrix * vec4(lightDirection, 0.0);
+	vec3 lightVec = normalize(vec3(lightDir4D));
 
 	// compute normal in camera frame in 3D
 	vec3 normalVec = normalMatrix * normal;
-
-	// compute light vector
-	vec3 lightVec = normalize(lightPos - vertPos);
 
 	// compute ambient component
 	vec3 ambient = kAmbient*ambientColor;
