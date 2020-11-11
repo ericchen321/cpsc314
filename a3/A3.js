@@ -134,13 +134,30 @@ var textureSphere = new THREE.Mesh(sphere, textureMaterial);
 textureSphere.position.set(7.5, sphereRadius, 0);
 scene.add(textureSphere);
 
+// LISTEN TO KEYBOARD
+var keyboard = new THREEx.KeyboardState();
+function checkKeyboard() {
+  if (keyboard.pressed("l")) {
+    var color_r = Math.random();
+    var color_g = Math.random();
+    var color_b = Math.random();
+    lightColor.value = new THREE.Color(color_r, color_g, color_b);
+  }
+  else if (keyboard.pressed("m")) {
+    var color_r = Math.random();
+    var color_g = Math.random();
+    var color_b = Math.random();
+    ambientColor.value = new THREE.Color(color_r, color_g, color_b);
+  }
+}
 
 // SETUP UPDATE CALL-BACK
 var render = function() {
+  checkKeyboard();
 	textureMaterial.needsUpdate = true;
 	phongMaterial.needsUpdate = true;
 	blinnPhongMaterial.needsUpdate = true;
-	gouraudMaterial.needsUpdate = true;
+  gouraudMaterial.needsUpdate = true;
 	requestAnimationFrame(render);
 	renderer.render(scene, camera);
 }
