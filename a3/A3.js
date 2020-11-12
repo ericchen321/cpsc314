@@ -42,7 +42,9 @@ floor.rotation.x = Math.PI / 2;
 scene.add(floor);
 
 //TEXTURES
-var rocksTexture =  {type: "t", value: new THREE.ImageUtils.loadTexture('images/gravel-rocks-texture.jpg')};
+var rockTexture =  {type: "t", value: new THREE.ImageUtils.loadTexture('images/gravel-rocks-texture.jpg')};
+var brickTexture = {type: "t", value: new THREE.ImageUtils.loadTexture('images/brick-normal-map.png')};
+var textureSelect = {type: 'i', value: 1};
 
 //LIGHTING PROPERTIES
 var lightColor = {type: "c", value: new THREE.Color(1.0,1.0,1.0)};
@@ -91,7 +93,16 @@ var blinnPhongMaterial = new THREE.ShaderMaterial({
 });
 var textureMaterial = new THREE.ShaderMaterial({
   uniforms: {
-    rocksTexture: rocksTexture,
+    rockTexture: rockTexture,
+    brickTexture: brickTexture,
+    textureSelect: textureSelect,
+    lightColor: lightColor,
+    ambientColor: ambientColor,
+    lightDirection: lightDirection,
+    kAmbient: kAmbient,
+    kDiffuse: kDiffuse,
+    kSpecular: kSpecular,
+    shininess: shininess,
   }
 });
 
@@ -148,6 +159,12 @@ function checkKeyboard() {
     var color_g = Math.random();
     var color_b = Math.random();
     ambientColor.value = new THREE.Color(color_r, color_g, color_b);
+  }
+  else if (keyboard.pressed("r")) {
+    textureSelect.value = 1;
+  }
+  else if (keyboard.pressed("b")) {
+    textureSelect.value = 2;
   }
 }
 
