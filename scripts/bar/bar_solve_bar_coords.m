@@ -1,7 +1,7 @@
 # solves barycentric coordinates alpha, beta and gamma
 # from pt coordinates a, b, c, p;
 # returns barycentric coordinates as a row vector
-# requires 3-vectors as inputs
+# requires three-vectors as inputs
 
 function bar_values = bar_solve_bar_coords (a, b, c, p)
   ab = b-a;
