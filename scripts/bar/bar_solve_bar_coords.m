@@ -19,7 +19,7 @@ function bar_values = bar_solve_bar_coords (a, b, c, p)
   beta = Ab/At;
   gama = Ac/At;
   bar_values = [alpha beta gama];
-  if (sum(bar_values)<(1.0-0.05) || sum(bar_values)>(1.0+0.05))
+  if (utils_check_equal(sum(bar_values), 1.0, 0.01)==0)
     printf("sum of barycentric coordinates is: %f\n", sum(bar_values));
     error("point is outside the given triangle!");
   endif

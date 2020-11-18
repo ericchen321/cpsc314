@@ -3,13 +3,18 @@
 # returns position of intersection
 
 function pos_intersect = ray_trace_solve_intersection_sphere (pos_camera, pos_sphere, radius_sphere, ray)
+  # check if the ray vector has been normalized
+  if (utils_check_equal(norm(ray), 1.0, 0.01) != 1)
+    error("the ray vector is not unitary!");
+  endif
+  
   # get theta
   v1 = pos_sphere - pos_camera;
-  v1_normalized = v1 / norm(v1);
+  v1_normalized = utils_normalize(v1);
   theta = acos(dot(ray, v1_normalized));
   
   # get d
-  d = norm(v1) * sin(theta)
+  d = norm(v1) * sin(theta);
   
   # get a
   if (d > radius_sphere)

@@ -1,5 +1,7 @@
 # need to run in the scripts/ directory
 
+source("utils/utils_check_equal.m")
+source("utils/utils_normalize.m")
 source("utils/utils_solve_distance.m")
 source("bar/bar_interpolate.m")
 source("bar/bar_solve_bar_coords.m")
