@@ -21,6 +21,6 @@ function retVal = ray_trace_solve_intersection_triangle (pos_pt1, pos_pt2, pos_p
   bar_values = bar_solve_bar_coords(pos_pt1, pos_pt2, pos_pt3, pos_intersect);
   
   # returns intersection and barycentric coords
-  retVal = [pos_intersect; bar_values]
+  retVal = [pos_intersect; bar_values];
   return;
 endfunction

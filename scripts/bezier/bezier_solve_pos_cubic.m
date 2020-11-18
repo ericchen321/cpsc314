@@ -22,7 +22,7 @@ function retVal = bezier_solve_pos_cubic (cp1, cp2, cp3, cp4, step, totalSteps)
   new_pos = bezier_solve_pos_quadratic(fict_1, fict_2, fict_3, step, totalSteps)(1, :);
   
   # pack up stuff in retVal
-  retVal = [new_pos; fict_1; fict_2; fict_3]
+  retVal = [new_pos; fict_1; fict_2; fict_3];
   
   return;
 endfunction

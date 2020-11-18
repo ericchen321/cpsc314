@@ -15,6 +15,6 @@ function handles = bezier_solve_handles_cubic (p0, p1, p2)
   l1 = l2 - D;
   r1 = p1 + p1r1;
   r2 = r1 + F;
-  handles = [l1; l2; r1; r2]
+  handles = [l1; l2; r1; r2];
   return;
 endfunction

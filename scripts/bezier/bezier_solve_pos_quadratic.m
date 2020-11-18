@@ -20,7 +20,7 @@ function retVal = bezier_solve_pos_quadratic (cp1, cp2, cp3, step, totalSteps)
   new_pos = fict_1 + scaleFactor*v3;
   
   # pack up stuff in retVal
-  retVal = [new_pos; fict_1; fict_2]
+  retVal = [new_pos; fict_1; fict_2];
   
   return;
 endfunction
