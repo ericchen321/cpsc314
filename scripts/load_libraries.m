@@ -1,9 +1,12 @@
 # need to run in the scripts/ directory
 
 source("utils/utils_check_equal.m")
+source("utils/utils_deg2rad.m")
+source("utils/utils_rad2deg.m")
 source("utils/utils_normalize.m")
 source("utils/utils_solve_distance.m")
 source("xform/xform_make_projection_matrix.m")
+source("lin_interp/lin_interp_interpolate_line.m")
 source("bar/bar_interpolate.m")
 source("bar/bar_solve_bar_coords.m")
 source("bezier/bezier_solve_pos_quadratic.m")
@@ -14,5 +17,7 @@ source("clip/clip_plot_triangle_in_ndc.m")
 source("ray_trace/ray_trace_solve_intersection_sphere.m")
 source("ray_trace/ray_trace_solve_intersection_plane.m")
 source("ray_trace/ray_trace_solve_intersection_triangle.m")
+source("ray_trace/ray_trace_solve_intersection_line.m")
 source("ray_trace/ray_trace_solve_normal.m")
+source("refract/refract_solve_refract_ray.m")
 
