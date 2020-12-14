@@ -18,6 +18,7 @@ source("ray_trace/ray_trace_solve_intersection_sphere.m")
 source("ray_trace/ray_trace_solve_intersection_plane.m")
 source("ray_trace/ray_trace_solve_intersection_triangle.m")
 source("ray_trace/ray_trace_solve_intersection_line.m")
-source("ray_trace/ray_trace_solve_normal.m")
+source("ray_trace/ray_trace_solve_intersection_box2D.m")
+source("ray_trace/ray_trace_solve_intersection_torus.m")
 source("refract/refract_solve_refract_ray.m")
 

@@ -13,10 +13,10 @@ function pos_intersect = ray_trace_solve_intersection_plane (pos_p, pos_camera, 
   
   # get a
   w = pos_p - pos_camera;
-  a = dot(w, normal)
+  a = dot(w, normal);
   
   # get b
-  b = dot(ray, normal)
+  b = dot(ray, normal);
   
   # get k
   k = a/b;

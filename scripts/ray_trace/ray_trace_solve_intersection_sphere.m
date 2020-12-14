@@ -1,8 +1,8 @@
 # solve for intersection between a ray and a sphere
 # requires normalized ray vector
-# returns position of intersection
+# returns [position of intersection; normal at intersection]
 
-function pos_intersect = ray_trace_solve_intersection_sphere (pos_camera, pos_sphere, radius_sphere, ray)
+function retVal = ray_trace_solve_intersection_sphere (pos_camera, pos_sphere, radius_sphere, ray)
   # check if the ray vector has been normalized
   if (utils_check_equal(norm(ray), 1.0, 0.01) != 1)
     error("the ray vector is not unitary!");
@@ -27,5 +27,10 @@ function pos_intersect = ray_trace_solve_intersection_sphere (pos_camera, pos_sp
   
   # get pos_intersect
   pos_intersect = pos_camera + b*ray;
+  
+  # get normal
+  normal = (pos_intersect - pos_sphere) / norm(pos_intersect - pos_sphere);
+  
+  retVal = [pos_intersect; normal]
   return;
 endfunction
