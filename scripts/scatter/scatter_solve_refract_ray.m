@@ -11,7 +11,7 @@
 # returns 1) the zero matrix for wrong inputs or blocked incident ray
 #         2) [zero vector; angle_of_incidence; zero vector] for total reflection
 
-function retVal = refract_solve_refract_ray (n_i, n_t, ray_i, normal)
+function retVal = scatter_solve_refract_ray (n_i, n_t, ray_i, normal)
   # check if the ray vector has been normalized
   if (utils_check_equal(norm(ray_i), 1.0, 0.01) != 1)
     error("the ray vector is not unitary!");
@@ -28,7 +28,7 @@ function retVal = refract_solve_refract_ray (n_i, n_t, ray_i, normal)
   angle_t = 0.0;
   
   ray_i_invert = -1.0 * ray_i;
-  # if incident ray is obscured, return zero
+  # if incident ray is occluded, return zero
   cos_theta_i = dot(ray_i_invert, normal)
   angle_i = utils_rad2deg(acos(cos_theta_i));
   if (cos_theta_i < 0.0)
