@@ -4,7 +4,7 @@
 # pos_target: target position in world frame
 # upVec: the up vector
 
-function VCS2WCSMat = frames_solve_xform_matrix_VCS2WCS (pos_cam, pos_target, upVec)
+function VCS2WCSMat = xform_solve_xform_matrix_VCS2WCS (pos_cam, pos_target, upVec)
   w = utils_normalize(pos_cam - pos_target)
   u = cross(utils_normalize(upVec), w)
   v = cross(w, u)
